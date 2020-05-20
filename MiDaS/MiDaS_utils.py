@@ -126,7 +126,10 @@ def resize_image(img):
     """
     height_orig = img.shape[0]
     width_orig = img.shape[1]
-    unit_scale = 384.
+    
+    # was: 384
+    # made it: 1536
+    unit_scale = 1536.
 
     if width_orig > height_orig:
         scale = width_orig / unit_scale
