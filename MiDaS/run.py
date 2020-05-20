@@ -22,7 +22,10 @@ def run_depth(img_names, input_path, output_path, model_path, Net, utils, target
     print("initialize")
 
     # select device
-    device = torch.device("cpu")
+    
+    # was: cpu
+    # changed to: cuda
+    device = torch.device("cuda")
     print("device: %s" % device)
 
     # load network
@@ -46,7 +49,10 @@ def run_depth(img_names, input_path, output_path, model_path, Net, utils, target
         # input
         img = utils.read_image(img_name)
         w = img.shape[1]
-        scale = 640. / max(img.shape[0], img.shape[1])
+        
+        # was: 640
+        # changed to: 1536
+        scale = 1536. / max(img.shape[0], img.shape[1])
         target_height, target_width = int(round(img.shape[0] * scale)), int(round(img.shape[1] * scale))
         img_input = utils.resize_image(img)
         print(img_input.shape)
