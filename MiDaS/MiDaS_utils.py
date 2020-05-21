@@ -115,7 +115,7 @@ def read_image(path):
     return img
 
 
-def resize_image(img):
+def resize_image(img, midas_scale_torch):
     """Resize image and make it fit for network.
 
     Args:
@@ -129,7 +129,7 @@ def resize_image(img):
     
     # was: 384
     # made it: 1536
-    unit_scale = 1536.
+    unit_scale = midas_scale_torch # 1536.
 
     if width_orig > height_orig:
         scale = width_orig / unit_scale
