@@ -11,7 +11,7 @@ import cv2
 import imageio
 
 
-def run_depth(img_names, input_path, output_path, model_path, Net, utils, target_w=None):
+def run_depth(midas_scale, midas_scale_torch, img_names, input_path, output_path, model_path, Net, utils, target_w=None):
     """Run MonoDepthNN to compute depth maps.
 
     Args:
@@ -52,9 +52,9 @@ def run_depth(img_names, input_path, output_path, model_path, Net, utils, target
         
         # was: 640
         # changed to: 1536
-        scale = 1536. / max(img.shape[0], img.shape[1])
+        scale = midas_scale / max(img.shape[0], img.shape[1])
         target_height, target_width = int(round(img.shape[0] * scale)), int(round(img.shape[1] * scale))
-        img_input = utils.resize_image(img)
+        img_input = utils.resize_image(img,midas_scale_torch)
         print(img_input.shape)
         img_input = img_input.to(device)
         # compute
