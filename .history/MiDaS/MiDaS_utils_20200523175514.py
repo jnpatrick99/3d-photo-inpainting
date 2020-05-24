@@ -5,6 +5,7 @@ import re
 import numpy as np
 import cv2
 import torch
+import imageio
 
 
 def read_pfm(path):
@@ -114,7 +115,7 @@ def read_image(path):
     return img
 
 
-def resize_image(img):
+def resize_image(img, midas_scale_torch):
     """Resize image and make it fit for network.
 
     Args:
@@ -125,11 +126,15 @@ def resize_image(img):
     """
     height_orig = img.shape[0]
     width_orig = img.shape[1]
+    
+    # was: 384
+    # made it: 1536
+    unit_scale = midas_scale_torch # 1536.
 
     if width_orig > height_orig:
-        scale = width_orig / 384
+        scale = width_orig / unit_scale
     else:
-        scale = height_orig / 384
+        scale = height_orig / unit_scale
 
     height = (np.ceil(height_orig / scale / 32) * 32).astype(int)
     width = (np.ceil(width_orig / scale / 32) * 32).astype(int)
@@ -156,21 +161,21 @@ def resize_depth(depth, width, height):
         array: processed depth
     """
     depth = torch.squeeze(depth[0, :, :, :]).to("cpu")
-
+    depth = cv2.blur(depth.numpy(), (3, 3))
     depth_resized = cv2.resize(
-        depth.numpy(), (width, height), interpolation=cv2.INTER_CUBIC
+        depth, (width, height), interpolation=cv2.INTER_AREA
     )
 
     return depth_resized
 
-def write_depth(path, depth, bits=1):
+def write_depth(path, depth, image, bits=1):
     """Write depth map to pfm and png file.
 
     Args:
         path (str): filepath without extension
         depth (array): depth
     """
-    write_pfm(path + ".pfm", depth.astype(np.float32))
+    # write_pfm(path + ".pfm", depth.astype(np.float32))
 
     depth_min = depth.min()
     depth_max = depth.max()
@@ -186,5 +191,6 @@ def write_depth(path, depth, bits=1):
         cv2.imwrite(path + ".png", out.astype("uint8"))
     elif bits == 2:
         cv2.imwrite(path + ".png", out.astype("uint16"))
-
+        imageio.imsave(path + ".jpg", image)
+        
     return

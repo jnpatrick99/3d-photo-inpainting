@@ -43,8 +43,8 @@ for idx in tqdm(range(len(sample_list))):
     print("Current Source ==> ", sample['src_pair_name'])
     mesh_fi = os.path.join(config['mesh_folder'], sample['src_pair_name'] +'.ply')
     image = imageio.imread(sample['ref_img_fi'])
-    run_depth([sample['ref_img_fi']], config['src_folder'], config['depth_folder'],
-              config['MiDaS_model_ckpt']) #, MonoDepthNet, MiDaS_utils)
+    run_depth(config['midas_scale'], config['midas_scale_torch'], [sample['ref_img_fi']], config['src_folder'], config['depth_folder'],
+              config['MiDaS_model_ckpt'], MonoDepthNet, MiDaS_utils, target_w=640)
     config['output_h'], config['output_w'] = np.load(sample['depth_fi']).shape[:2]
     frac = config['longer_side_len'] / max(config['output_h'], config['output_w'])
     config['output_h'], config['output_w'] = int(config['output_h'] * frac), int(config['output_w'] * frac)
@@ -62,7 +62,6 @@ for idx in tqdm(range(len(sample_list))):
         depth = vis_depths[-1]
         model = None
         torch.cuda.empty_cache()
-        # exit()
         print("Start Running 3D_Photo ...")
         depth_edge_model = Inpaint_Edge_Net(init_weights=True)
         depth_edge_weight = torch.load(config['depth_edge_model_ckpt'],
